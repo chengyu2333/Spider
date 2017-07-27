@@ -4,17 +4,15 @@
 import base64
 import json
 from urllib import request
-from bs4 import BeautifulSoup
-import util
 import mongo
-
-
 headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36"}
 
 
-#抓取文章数据
-def catch_data(cmsid,num = 30,cp = 1,priority = 0):
-    url = "http://open.tool.hexun.com/MongodbNewsService/newsListPageByJson.jsp?id="+str(cmsid)+"&s="+str(num)+"&cp="+str(cp)+"&priority="+str(priority)
+# 单次抓取文章数据
+def catch_data(cmsid, step=200,page=1,priority=0):
+    if int(step)>200:
+        print("max 200", step)
+    url = "http://open.tool.hexun.com/MongodbNewsService/newsListPageByJson.jsp?id="+str(cmsid)+"&s="+str(step)+"&cp="+str(page)+"&priority="+str(priority)
     try:
         req = request.Request(url, None, headers)
         data = request.urlopen(req).read()
@@ -36,13 +34,35 @@ def catch_data(cmsid,num = 30,cp = 1,priority = 0):
 
 # 抓取整个类目下的文章
 def catch_data_cms(cmsid):
-    cp = 0
+    cmsids = mongo.get_cmsid()
+    cmsids = cmsids[0]
+    total = cmsids['total']
+    current = 0
+    step = 200   # 每次抓取文章的数量
+    if not cmsids:
+        return
     while True:
-        cp += 1
-        data = catch_data(cmsid, 30, cp)
-        if data["result"]:
-            print('catch article: ', data['result'])
-        else:
-            print(cmsid, "抓取完成,数量：", data['totalNumber'])
-            break
+        tail = total % current  # 余数
+        page = total // current
+        page = page if tail else page+1
+        print("page:", page)
+        data = catch_data(cmsids['cmsid'], step=step, page=page)
+        if data:
+            num = len(data['result'])
+            mongo.set_page_cmsid(cmsids['_id'], num)
+            current = current + num
+            if current >= total:
+                print(cmsid, "抓取完成,数量：", cmsids['current'])
+                break
+            for article in data["result"]:
+                print('catch article: ', print(article['id']))
 
+
+# 抓取整站文章
+def catch_article_all():
+    while True:
+        cmsids = mongo.get_cmsid()
+        cmsids = cmsids[0]
+
+
+# catch_data_cms("114556500")

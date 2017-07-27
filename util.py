@@ -1,5 +1,5 @@
-import chardet
-import gzip
+import sys
+import time
 
 # Html解码
 def html_decode(html):
@@ -21,3 +21,17 @@ def url_filter(url):
             return False
     except Exception as e:
         return False
+
+
+# 进度条
+def view_bar(num, total):
+  rate = num / total
+  rate_num = int(rate * 100)
+  r = '\n[%s%s]%d%%' % ("="*num, " "*(100-num), rate_num, )
+  sys.stdout.write(r)
+  sys.stdout.flush()
+
+# 测试进度条
+for i in range(0, 101):
+    time.sleep(0.1)
+    view_bar(i, 100)
