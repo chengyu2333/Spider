@@ -5,12 +5,14 @@ import base64
 import json
 from urllib import request
 import mongo
+import util
+
 headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36"}
 
 
 # 单次抓取文章数据
-def catch_data(cmsid, step=200,page=1,priority=0):
-    if int(step)>200:
+def catch_data(cmsid, step=200, page=1, priority=0):
+    if int(step) > 200:
         print("max 200", step)
     url = "http://open.tool.hexun.com/MongodbNewsService/newsListPageByJson.jsp?id="+str(cmsid)+"&s="+str(step)+"&cp="+str(page)+"&priority="+str(priority)
     try:
@@ -32,37 +34,43 @@ def catch_data(cmsid, step=200,page=1,priority=0):
         print("catch_data",str(e))
 
 
-# 抓取整个类目下的文章
+# 抓取某个类目下的文章
 def catch_data_cms(cmsid):
-    cmsids = mongo.get_cmsid()
-    cmsids = cmsids[0]
-    total = cmsids['total']
-    current = 0
-    step = 200   # 每次抓取文章的数量
-    if not cmsids:
+    total = cmsid['total']
+    step = 200  # 每次抓取文章的数量
+    current = 1
+
+    if not cmsid:
         return
     while True:
         tail = total % current  # 余数
-        page = total // current
+        page = total // step
         page = page if tail else page+1
-        print("page:", page)
-        data = catch_data(cmsids['cmsid'], step=step, page=page)
+        data = catch_data(cmsid['cmsid'], step=step, page=page)
         if data:
+            util.view_bar(current, total)
+            print(current, "/", total, end='')
             num = len(data['result'])
-            mongo.set_page_cmsid(cmsids['_id'], num)
+            mongo.set_page_cmsid(cmsid['_id'], num)
             current = current + num
+
             if current >= total:
-                print(cmsid, "抓取完成,数量：", cmsids['current'])
+                print(cmsid, "抓取完成,数量：", cmsid['current'])
                 break
-            for article in data["result"]:
-                print('catch article: ', print(article['id']))
+            # for article in data["result"]:
+                # print('catch article: ', print(article['id']))
 
 
 # 抓取整站文章
 def catch_article_all():
-    while True:
-        cmsids = mongo.get_cmsid()
-        cmsids = cmsids[0]
+
+    cmsid = mongo.get_cmsid(cmsid="101077663")
+    print(cmsid)
+    catch_data_cms(cmsid)
+
+    # while True:
+    #     cmsids = mongo.get_cmsid()
+    #     cmsids = cmsids[0]
 
 
-# catch_data_cms("114556500")
+catch_article_all()

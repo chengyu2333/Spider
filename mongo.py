@@ -15,15 +15,17 @@ def add_cmsid(cmsid,cmstitle,cmsurl,group,total):
 
 
 # 从mongodb中获取cmsID
-def get_cmsid(num=1, api=True):
+def get_cmsid(num=1, api=True,cmsid="0"):
     collection = db.cmsid
+    if cmsid:
+       return collection.find_one({"cmsid": int(cmsid)})
     if api:
         res = collection.find({"$where": "this.cmsid>0 && this.total>this.current"}).limit(num)
     else:
         res = collection.find({"$where": "this.cmsid==0 && this.total==0"}).limit(num)
     cmsids = []
     for cmsid in res:
-        cmsids.append(str(cmsid))
+        cmsids.append(cmsid)
     return cmsids
 
 
@@ -31,7 +33,7 @@ def get_cmsid(num=1, api=True):
 def set_page_cmsid(url, num):
     collection = db.cmsid
     result = collection.update({"_id": url}, {"$inc": {"current":num}})
-    print(result)
+    return result
 
 # 设置cmsid文章数量
 def get_total(url):

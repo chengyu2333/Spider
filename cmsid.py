@@ -128,7 +128,6 @@ def catch_cmsid_all(thread = False):
             for item in nav:
                 t = threading.Thread(target=analyse, args=(item,))
                 threads.append(t)
-                break
             print("开启了的线程数",len(threads))
             for i in range(len(threads)):
                 threads[i].start()
@@ -138,9 +137,5 @@ def catch_cmsid_all(thread = False):
             #单线程
             for item in nav:
                 analyse(item)
-
-
-
-
     except Exception as e:
         print("catch_cmsid_all", str(e))

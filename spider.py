@@ -3,7 +3,7 @@ import  article
 
 def run():
     # 抓取所有cmsid
-    cmsid.catch_cmsid_all()
+    cmsid.catch_cmsid_all(True)
     # 测试抓取cmsid
     # print(cmsid.catch_cmsid("http://futures.hexun.com/topic/"))
 
