@@ -1,4 +1,5 @@
 import sys
+import os
 import time
 
 # Html解码
@@ -25,15 +26,18 @@ def url_filter(url):
 
 # 进度条
 def view_bar(num, total):
-    num = int(num/total*100)
-    total = 100
+    # os.system('cls'.encode().decode("gbk"))
+
+    num = int(num/total*50)
+    total = 50
     rate = num / total
-    rate_num = int(rate * 100)
-    r = '\n[%s%s]%d%%  ' % ("="*num, " "*(100-num), rate_num, )
+    rate_num = int(rate * 50)
+    r = '\r[%s%s]%d%%  ' % ("="*num, " "*(50-num), rate_num, )
     sys.stdout.write(r)
     sys.stdout.flush()
 
-# 测试进度条
+
+    # 测试进度条
 # for i in range(0, 101):
 #     time.sleep(0.1)
 #     view_bar(i, 100)
