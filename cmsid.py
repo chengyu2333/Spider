@@ -1,5 +1,6 @@
 #!/usr/bin/python
-# coding = utf-8
+# encoding: utf-8
+
 import re
 import threading
 import json
@@ -8,7 +9,7 @@ from pymongo import errors
 from bs4 import BeautifulSoup
 import util
 import mongo
-headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36"}
+headers = {"User-Agent": util.config_get('spider', 'user_agent')}
 
 
 # 抓取栏目文章总数
@@ -30,13 +31,9 @@ def catch_cmsid(url):
             return
 
         req = request.Request(url, None, headers)
-        try:
-            html = request.urlopen(req).read()
-            html = util.html_decode(html)
-            dom = BeautifulSoup(html, "html5lib")
-        except Exception as e:
-            print("x ", end='')
-            return
+        html = request.urlopen(req).read()
+        html = util.html_decode(html)
+        dom = BeautifulSoup(html, "html5lib")
 
         # 匹配是否为cms页
         if 'hxPage.cmsID' in html: # 有api
@@ -97,7 +94,7 @@ def analyse(item):
                 if cmsid:
                     try:
                         # 存入mongoDb
-                        mongo.add_cmsid(cmsid['cmsid'], cmsid['cmstitle'], cmsid['cmsurl'], item['name'],cmsid['total'])
+                        mongo.add_cmsid(cmsid['cmsid'], cmsid['cmstitle'], cmsid['cmsurl'], item['name'], cmsid['total'])
                         print("√ ", end='')
                     except errors.DuplicateKeyError as dk:
                         print("E ", end='')
@@ -106,7 +103,7 @@ def analyse(item):
 
 
 # 抓取全部cmsid
-def catch_cmsid_all(thread=False,start=1,end=0):
+def catch_cmsid_all(thread=False, start=1, end=0):
     current = 0
     try:
         # 抓取板块信息
@@ -118,7 +115,7 @@ def catch_cmsid_all(thread=False,start=1,end=0):
         html = util.html_decode(html)
         dom = BeautifulSoup(html,"html5lib")
         for a in dom.select(".newsTop a"):
-            nav.append({"name": a.string,"url": a['href']})
+            nav.append({"name": a.string, "url": a['href']})
         print("抓取板块数量：", len(nav))
 
         if not end:
@@ -130,16 +127,17 @@ def catch_cmsid_all(thread=False,start=1,end=0):
             for item in nav:
                 t = threading.Thread(target=analyse, args=(item,))
                 threads.append(t)
-            print("开启了的线程数",len(threads))
             for i in range(len(threads)):
-                threads[i].start()
+                if start <= i+1 <= end:
+                    threads[i].start()
             for i in range(len(threads)):
-                threads[i].join()
+                if start <= i + 1 <= end:
+                    threads[i].join()
         else:
             # 单线程
-            current += 1
-            if start <= current <= end:
-                for item in nav:
+            for item in nav:
+                current += 1
+                if start <= current <= end:
                     analyse(item)
     except Exception as e:
         print("catch_cmsid_all", str(e))

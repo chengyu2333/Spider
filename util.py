@@ -1,6 +1,24 @@
+#!/usr/bin/python
+# encoding: utf-8
+import configparser
 import sys
 import os
 import time
+import platform
+import hashlib
+
+
+def config_get(section, option):
+    config = configparser.ConfigParser()
+    config.read("config.conf")
+    return config.get(section, option)
+
+
+#md5
+def md5(obj):
+    m = hashlib.md5()
+    m.update(obj.encode())
+    return m.hexdigest()
 
 # Html解码
 def html_decode(html):
@@ -31,13 +49,14 @@ def view_bar(num, total):
     num = int(num/total*50)
     total = 50
     rate = num / total
-    rate_num = int(rate * 50)
+    rate_num = int(rate * 100)
     r = '\r[%s%s]%d%%  ' % ("="*num, " "*(50-num), rate_num, )
     sys.stdout.write(r)
     sys.stdout.flush()
 
 
-    # 测试进度条
-# for i in range(0, 101):
-#     time.sleep(0.1)
-#     view_bar(i, 100)
+def isWindowsSystem():
+    return 'Windows' in platform.system()
+
+def isLinuxSystem():
+    return 'Linux' in platform.system()

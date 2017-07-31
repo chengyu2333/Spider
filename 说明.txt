@@ -1,0 +1,11 @@
+环境说明：
+
+windows
+Python 3.4
+MongoDb
+
+模块：
+
+bs4
+pymongo
+html5lib

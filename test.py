@@ -1,22 +1,17 @@
-from pymongo import MongoClient
+#!/usr/bin/python
+# encoding: utf-8
 
-client = MongoClient("localhost", 27017)
-db = client.spider
-coll = db.article
-# re = coll.find({"_id":101225916})
-# print(re[0])
-
-
-import threading
+from urllib import request
+from bs4 import BeautifulSoup
+import json
+import base64
+import util
+import os
 import time
+import configparser
 
-COUNT = 10
-
-
-def printHello():
-    global COUNT
-    print(COUNT)
-    COUNT = COUNT - 1
-
-
-printHello()
+headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.86 Safari/537.36"}
+url = "http://open.tool.hexun.com/MongodbNewsService/newsListPageByJson.jsp?id=187804274&s=1&cp=6&priority=0"
+# req = request.Request(url, None, headers)
+# data = request.urlopen(req).read().decode("gbk", errors="ignore")
+# data = json.loads(data)
