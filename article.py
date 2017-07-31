@@ -63,9 +63,7 @@ def catch_article_multi(cmsid, step=100, page=1, priority=0):
             # 拼装ID
             # result['id'] = int(result['entityurl'].split('/')[3].replace('-', '')) + result['id']
             # 抓取评论
-            t_comment = threading.Thread(target=catch_comment, args=(result['id'],))
-            threads_img.append(t_comment)
-            # result['comment'] = catch_comment()
+            result['comment'] = catch_comment(result['id'])
             # 抓取图片
             dom = BeautifulSoup(result['content'], "html5lib")
             dom_img = dom.select('img')
@@ -93,7 +91,6 @@ def catch_article_multi(cmsid, step=100, page=1, priority=0):
             result['content'] = str(dom.body)
 
         # 多线程下载图片
-        
         # print("thread count:", len(threads))
         for i in threads_img:
             i.start()
