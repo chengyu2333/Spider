@@ -64,8 +64,9 @@ def catch_url():
             dom = BeautifulSoup(html, "html5lib")
             dom_title = dom.select(rule['article_title'])
             print("title-list:", dom_title)
-            for title in dom_title:
-                print("title:", title.string, "   ", title['href'])
+
+            # for title in dom_title:
+            #     print("title:", title.string, "   ", title['href'])
         except Exception as e:
             print(str(e))
 
@@ -74,10 +75,9 @@ def catch_url():
 def run():
     pass
     # print(catch_article(url_article))
-    # catch_url()
-    url = "http://caidao.hexun.com/25405058/blog112326117.html"
-    url1 = "http://news.hexun.com/2017-07-31/190250520.html"
-    data = catch_article_single(url1)
-    print(data['id'])
+    catch_url()
+    url1 = "http://forex.hexun.com/2017-07-24/190162151.html"
+    # data = catch_article_single(url1)
+    # print(data['title'])
 
 run()

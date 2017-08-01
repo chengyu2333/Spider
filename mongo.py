@@ -66,8 +66,8 @@ def add_article(data, cms):
         del article['id']
         article['column'] = {"group": cms['group'], "column": cms['cmstitle'], "column_url": cms['_id'], "column_id": cms['cmsid']}
         # 如果评论为空就不添加评论字段
-        if article['comment'] is None:
-            del article['comment']
+        # if article['comment'] is None:
+        #     del article['comment']
         try:
             collection.insert(article)
         except errors.DuplicateKeyError as dk:

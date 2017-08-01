@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # encoding: utf-8
-
 import util
 import cmsid
 import time
 import article
 import mongo
 import socket
+import trace
 
 def run():
     socket.setdefaulttimeout(5)
@@ -22,7 +22,7 @@ def run():
     # cmsid.catch_cmsid_all(thread=False, start=2)
 
     # 测试抓取单个cmsid
-    # print(cmsid.catch_cmsid("http://futures.hexun.com/topic/"))
+    # print(cmsid.catch_cmsid("http://gold.hexun.com/market/"))
 
     # 抓取栏目下所有文章
 

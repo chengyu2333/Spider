@@ -10,8 +10,12 @@ from urllib import request
 import mongo
 import util
 headers = {"User-Agent": util.config_get('spider', 'user_agent')}
+# 当前正在抓取的文章
 current = 0
+# 文章总计
 total = 0
+# 错误计数
+error_count = 0
 
 
 # 下载图片
@@ -24,11 +28,12 @@ def down_pic(url, path):
 
 # 获取评论
 def catch_comment(article_id):
+    # TODO 获取到直接在数据库更新
     url = "http://comment.tool.hexun.com/Comment/GetComment.do?commentsource=1&articlesource=1&articleid="+str(article_id)+"&pagesize=100&pagenum=1"
     try:
         req = request.Request(url, None, headers)
         data = request.urlopen(req).read()
-        data = data.decode('gbk', errors="ignore")
+        data = data.decode()
         # 去首位括号
         data = data[1:]
         data = data[:-1]
@@ -54,7 +59,7 @@ def catch_article_multi(cmsid, step=100, page=1, priority=0):
         data = json.loads(data)
         for result in data['result']:
             util.view_bar(current, total)
-            print(current, "/", total, end='\n')
+            print(current, "/", total, end='')
             current += 1
             result['content'] = base64.b64decode(result['content'])
             result['content'] = result['content'].decode('gbk', errors="ignore")
@@ -73,7 +78,7 @@ def catch_article_multi(cmsid, step=100, page=1, priority=0):
                     img_url = img['src']
                     suffix = img_url.split(".")[-1]
                     file_name_hash = util.md5(img_url)
-                    img_dir_path = file_name_hash[0:3] + "/" + file_name_hash[4:7]
+                    img_dir_path = file_name_hash[0:2] + "/" + file_name_hash[3:6]
                     img_fullname = img_dir_path + "/" + file_name_hash + "." + suffix
                     if util.isWindowsSystem():
                         img_dir_path = ("E:/spider_data/" + img_dir_path).encode("gbk")
@@ -96,10 +101,9 @@ def catch_article_multi(cmsid, step=100, page=1, priority=0):
             i.start()
         for i in threads_img:
             i.join()
-
         return data
     except Exception as e:
-        print("x"+str(e), end='')
+        print("x", end='')
     finally:
         pass
 

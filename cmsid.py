@@ -35,16 +35,22 @@ def catch_cmsid(url):
         html = util.html_decode(html)
         dom = BeautifulSoup(html, "html5lib")
 
-        # 匹配是否为cms页
-        if 'hxPage.cmsID' in html: # 有api
-            cmsid = re.findall('hxPage.cmsID="(.*?)";', html)[0]
-        elif 'hxPage.maxPage' in html or 'hxPage.numPage' in html: # 无api
-            cmsid = "0"
-        else:
-            return None
         if dom.select("title"):
             title = dom.select("title")[0].string
-        return {"cmsid":cmsid, "cmstitle":title, "cmsurl":url, "total": catch_total(cmsid)}
+
+        # 匹配是否为cms页和类型
+        if 'hxPage.cmsID' in html: # 有api
+            cmsid = re.findall('hxPage.cmsID="(\d+?)";', html)[0]
+            return {"cmsid": cmsid, "cmstitle": title, "cmsurl": url, "total": catch_total(cmsid)}
+        elif 'hxPage.maxPage' in html:
+            cmsid = "0"
+            total = re.findall('hxPage.maxPage(\d+?);', html)[0]
+        elif 'hxPage.numPage' in html:  # 无api
+            cmsid = "0"
+            total = re.findall('hxPage.numPage=(\d+?);', html)[0]
+        else:
+            return None
+        return {"cmsid":cmsid, "cmstitle":title, "cmsurl":url, "total": total}
     except Exception as e:
         print("x ", end='')
 

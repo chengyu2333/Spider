@@ -26,6 +26,8 @@ def html_decode(html):
         return html.decode("gbk", errors="ignore")
     elif "utf-8" in str(html) or "UTF-8" in str(html):
         return html.decode("utf8", errors="ignore")
+    else:
+        return html
 
 
 # 过滤url
