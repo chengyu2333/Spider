@@ -1,4 +1,4 @@
-#!/usr/bin/python
+﻿#!/usr/bin/python
 # encoding: utf-8
 
 from pymongo import MongoClient
@@ -67,12 +67,12 @@ def add_article(data, cms):
         article['column'] = {"group": cms['group'], "column": cms['cmstitle'], "column_url": cms['_id'], "column_id": cms['cmsid']}
         # 如果评论为空就不添加评论字段
         # if article['comment'] is None:
-        #     del article['comment']
         try:
             collection.insert(article)
         except errors.DuplicateKeyError as dk:
             duplicate_key += 1
         except Exception as e:
+        #     del article['comment']
             print(str(e))
 
 
